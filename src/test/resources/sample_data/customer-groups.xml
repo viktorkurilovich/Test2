@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<customer-groups xmlns="http://www.demandware.com/xml/impex/customergroup/2007-06-30">
+  <customer-group group-id="4444">
+    <description>Test_FR</description>
+    <custom-attributes/>
+  </customer-group>
+  <customer-group group-id="2222">
+    <description>Test_NL</description>
+    <custom-attributes/>
+  </customer-group>
+  <customer-group group-id="7890">
+    <description>Tst_RC</description>
+    <custom-attributes/>
+  </customer-group>
+  <customer-group group-id="5555">
+    <description>Test_MP</description>
+    <custom-attributes>
+      <custom-attribute attribute-id="campaignName">
+        <value>TestCampaign</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignFrom">
+        <value>2019-09-10T00:00:00.000Z</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignTo">
+        <value>2019-09-11T00:00:00.000Z</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignType">
+        <value>TestArt</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignDesc">
+        <value>TestMech</value>
+      </custom-attribute>
+    </custom-attributes>
+  </customer-group>
+  <customer-group group-id="1345">
+    <description>Test_SK</description>
+    <custom-attributes>
+      <custom-attribute attribute-id="campaignName">
+        <value>Saskias Kampagne</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignFrom">
+        <value>2019-09-25T00:00:00.000Z</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignTo">
+        <value>2019-09-28T00:00:00.000Z</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignType">
+        <value>TestArt</value>
+      </custom-attribute>
+      <custom-attribute attribute-id="campaignDesc">
+        <value>Buy One, get One for free</value>
+      </custom-attribute>
+    </custom-attributes>
+  </customer-group>
+</customer-groups>

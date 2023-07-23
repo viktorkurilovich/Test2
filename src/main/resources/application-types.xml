@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="segmentsample" format="json">
+      <types:shape format="weave" example="examples/segment_sample-2.json"><![CDATA[%dw 2.0
+type segmentsample = Array<{|
+  Owner: Null, 
+  PartnerKey: Null, 
+  ObjectID: Null, 
+  CustomerKey: Null, 
+  ModifiedDate: Null, 
+  Properties: {|
+    Property: Array<{|
+      Name: String, 
+      Value: String
+    |}>
+  |}, 
+  Name: Null, 
+  PartnerProperties: Null, 
+  ObjectState: Null, 
+  Type: String, 
+  Keys: Null, 
+  CreatedDate: Null, 
+  ID: Null, 
+  CorrelationID: Null, 
+  Client: Null
+|}> {"MetadataFormat": "json",
+"example": "[{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"1000\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"2222\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SFCC_customer_groups" format="xml">
+      <types:example format="xml" element="{http://www.demandware.com/xml/impex/customergroup/2007-06-30}customer-groups" location="examples/sfcc_customer_groups.xml"/>
+    </types:type>
+    <types:type name="recycle_bag_csv" format="csv">
+      <types:shape format="weave" example="examples/msp_ret_recycling_bag_190902151718-1.csv"><![CDATA[%dw 2.0
+
+type recycle_bag_csv = Array<{|  ID: String,   ShopKundennummer: String,   ShopAuftragsnummer: String,   AnzahlTueten: String,   DatumBearbeitung: String|}>
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+        <types:property name="separator" value=","/>
+      </types:properties>
+    </types:type>
+    <types:type name="recyclebag_json" format="json">
+      <types:shape format="weave" example="examples/recycle.json"><![CDATA[%dw 2.0
+
+type recyclebag_json = {|
+  orderNo: String, 
+  status: String, 
+  "sap-orderNo": String, 
+  data: {|
+    "customer-no": String, 
+    "processing-date": String, 
+    "num-bags": Number {"typeId": "int"}
+  |}
+|} {"example": "{\"orderNo\":\"t-00005532\",\"status\":\"ORDERSTATUS\",\"sap-orderNo\":\"435345345\",\"data\":{\"customer-no\":\"kdj\",\"processing-date\":\"dasdk\",\"num-bags\":2}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="customer_groups_xsd" format="xml">
+      <types:shape format="xml-schema" element="{http://www.demandware.com/xml/impex/customergroup/2007-06-30}customer-groups" location="schemas/customergroup.xsd"/>
+    </types:type>
+    <types:type name="customergroups_from_sfmc_exp_json" format="json">
+      <types:shape format="weave" example="examples/customer_from_sfmc_exp.json"><![CDATA[%dw 2.0
+
+type customergroups_from_sfmc_exp_json = Array<{|  Owner: Null,   PartnerKey: Null,   ObjectID: Null,   CustomerKey: Null,   ModifiedDate: Null,   Properties: {|    Property: Array<{|      Name: String,       Value: String    |}>
+  |}, 
+  Name: Null, 
+  PartnerProperties: Null, 
+  ObjectState: Null, 
+  Type: String, 
+  Keys: Null, 
+  CreatedDate: Null, 
+  ID: Null, 
+  CorrelationID: Null, 
+  Client: Null
+|}> {"example": "[{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"4444\"},{\"Name\":\"segment_name\",\"Value\":\"Test_FR\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"False\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"1234\"},{\"Name\":\"segment_name\",\"Value\":\"Mein Geburtsagsfilter\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"True\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"2222\"},{\"Name\":\"segment_name\",\"Value\":\"Test_NL\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"False\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"1111\"},{\"Name\":\"segment_name\",\"Value\":\"Test_AU\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"True\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"3333\"},{\"Name\":\"segment_name\",\"Value\":\"Test_ES\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"True\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"7890\"},{\"Name\":\"segment_name\",\"Value\":\"Tst_RC\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"False\"},{\"Name\":\"Campaign Name\",\"Value\":\"\"},{\"Name\":\"Start Date\",\"Value\":\"\"},{\"Name\":\"End Date\",\"Value\":\"\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"5555\"},{\"Name\":\"segment_name\",\"Value\":\"Test_MP\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"False\"},{\"Name\":\"Campaign Name\",\"Value\":\"TestCampaign\"},{\"Name\":\"Start Date\",\"Value\":\"9\/10\/2019 12:00:00 AM\"},{\"Name\":\"End Date\",\"Value\":\"9\/11\/2019 12:00:00 AM\"},{\"Name\":\"Kampagnen Art\",\"Value\":\"TestArt\"},{\"Name\":\"Kampagnen Mechanism\",\"Value\":\"TestMech\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="groupmember_sfmc_expl_json" format="json">
+      <types:shape format="weave" example="examples/groupmember_sfmc_expl.json"><![CDATA[%dw 2.0
+
+type groupmember_sfmc_expl_json = Array<{|  Owner: Null,   PartnerKey: Null,   ObjectID: Null,   CustomerKey: Null,   ModifiedDate: Null,   Properties: {|    Property: Array<{|      Name: String,       Value: String    |}>
+  |}, 
+  Name: Null, 
+  PartnerProperties: Null, 
+  ObjectState: Null, 
+  Type: String, 
+  Keys: Null, 
+  CreatedDate: Null, 
+  ID: Null, 
+  CorrelationID: Null, 
+  Client: Null
+|}> {"example": "[{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+regression@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00025003\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+automation@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00018001\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+poslead@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00014508\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+firstorder@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00016509\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+leadcheck@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00018501\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null},{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"PersonEmail\",\"Value\":\"lutzi.lutz06+registrierung@gmail.com\"},{\"Name\":\"SFCC_Customer_Number__pc\",\"Value\":\"00020502\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="sfcc_currentgroup_expl_json" format="json">
+      <types:shape format="weave" example="examples/current_group_expl.json"><![CDATA[%dw 2.0
+
+type sfcc_currentgroup_expl_json = {|
+  Owner: Null, 
+  PartnerKey: Null, 
+  ObjectID: Null, 
+  CustomerKey: Null, 
+  ModifiedDate: Null, 
+  Properties: {|
+    Property: Array<{|      Name: String,       Value: String    |}>
+  |}, 
+  Name: Null, 
+  PartnerProperties: Null, 
+  ObjectState: Null, 
+  Type: String, 
+  Keys: Null, 
+  CreatedDate: Null, 
+  ID: Null, 
+  CorrelationID: Null, 
+  Client: Null
+|} {"example": "{\"Owner\":null,\"PartnerKey\":null,\"ObjectID\":null,\"CustomerKey\":null,\"ModifiedDate\":null,\"Properties\":{\"Property\":[{\"Name\":\"segment_id\",\"Value\":\"1345\"},{\"Name\":\"segment_name\",\"Value\":\"Test_SK\"},{\"Name\":\"delete_in_SFCC_flag\",\"Value\":\"False\"},{\"Name\":\"CampaignName\",\"Value\":\"Saskias Kampagne\"},{\"Name\":\"StartDate\",\"Value\":\"9\/25\/2019 12:00:00 AM\"},{\"Name\":\"EndDate\",\"Value\":\"9\/28\/2019 12:00:00 AM\"},{\"Name\":\"KampagnenArt\",\"Value\":\"TestArt\"},{\"Name\":\"KampagnenMechanism\",\"Value\":\"Buy One, get One for free\"}]},\"Name\":null,\"PartnerProperties\":null,\"ObjectState\":null,\"Type\":\"DataExtensionObject\",\"Keys\":null,\"CreatedDate\":null,\"ID\":null,\"CorrelationID\":null,\"Client\":null}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="call_statistics_csv" format="csv">
+      <types:shape format="weave"><![CDATA[%dw 2.0
+
+type call_statistics_csv = Array<{|  CALLID: String,   CALLDIRECTION: String,   CALLDATE: Date,   QUEUE: String,   CALLEDNUMBER: String,   CALLINGNUMBER: String,   AGENTCODE: String,   DEVICECODE: String,   ALERTINGTIME: String,   TALKINGTIME: String,   HOLDTIME: String,   CALLJOBRESULT: String,   RESULT: String|}>
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+      </types:properties>
+    </types:type>
+    <types:type name="callstatistics_csv" format="csv">
+      <types:shape format="weave"><![CDATA[%dw 2.0
+
+type callstatistics_csv = Array<{|  CallID: String,   CallDirection: String,   CallDate: Date,   Queue: String,   CalledNumber: String,   CallingNumber: String,   AgentCode: String,   DeviceCode: String,   AlertingTime: String,   TalkingTime: String,   HoldTime: String,   CallJobResult: String,   Result: String|}>
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+      </types:properties>
+    </types:type>
+    <types:type name="call_statistics_v3_csv" format="csv">
+      <types:shape format="weave"><![CDATA[%dw 2.0
+
+type call_statistics_v3_csv = Array<{|  CallID: String,   CallDirection: String,   CallDate: Date,   Queue: String,   Destination: String,   CalledNumber: String,   AgentCode: String,   DeviceCode: String,   CallBegin: String,   AlertingTime: String,   TalkingTime: String,   HoldTime: String,   CallJobResult: String,   Result: String,   CSS: String|}>
+
+]]></types:shape>
+      <types:properties>
+        <types:property name="headerLineNumber" value="0"/>
+        <types:property name="header" value="true"/>
+        <types:property name="isQuotedString" value="false"/>
+      </types:properties>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a8583d6b-fdd7-4976-92ea-2b190f10e963">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="segmentsample"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#90c29d59-3015-4513-8f96-2e77a4f73d3b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="segmentsample"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="segmentsample"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d401eed5-e0bf-4fe9-b4db-9973ff4f2c41">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SFCC_customer_groups"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#729ce639-68bd-4b6f-89a1-10fa25c867ff">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="segmentsample"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c97aab9d-6581-4c3a-88af-da1fccc52f5d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="recycle_bag_csv"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="recyclebag_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#16231010-7c86-49c7-b716-7384b63e5dc3">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="groupmember_sfmc_expl_json"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="payload_Campaigns" type="customergroups_from_sfmc_exp_json"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="customer_groups_xsd"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#93d88248-37ab-44fb-a47f-9ea8075a3e2b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="payloadCurrentGroup" type="sfcc_currentgroup_expl_json"/>
+        </types:variables>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6d37db61-ff00-48c0-8071-561fccf1d0ba">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="call_statistics_v3_csv"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#22a809d1-3deb-43fc-9f1f-48b97eb8d605"/>
+  <types:enrichment select="#1b3f6c98-8fd4-4ee2-840d-a3fae478442f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="call_statistics_v3_csv"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
+	xmlns:sfdc-marketing-cloud="http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud/current/mule-sfdc-marketing-cloud.xsd
+http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd">
+	<http:listener-config name="HTTP_Listener_config"
+		doc:name="HTTP Listener config"
+		doc:id="1fbc9844-1a7b-4a68-b9c8-e5e04d17078c">
+		<http:listener-connection host="0.0.0.0"
+			port="8091" />
+	</http:listener-config>
+	<sftp:config name="SFTP_Config" doc:name="SFTP Config"
+		doc:id="7fb74465-b3b4-4837-abb4-4445a61858f4">
+		<sftp:connection host="${sftp.host}"
+			username="${sftp.user}" password="${secure::sftp.pw}"
+			connectionTimeout="90" responseTimeout="90"
+			knownHostsFile="sftp_known_hosts">
+			<reconnection>
+				<reconnect frequency="5000" count="5" />
+			</reconnection>
+		</sftp:connection>
+	</sftp:config>
+	<sftp:config name="SFTP_Config_Callcenter"
+		doc:name="SFTP Config" doc:id="67f40eab-938b-4181-998d-269a16011215">
+		<sftp:connection host="${sftp.host.callcenter}"
+			username="${sftp.user.callcenter}"
+			password="${secure::sftp.pw.callcenter}" connectionTimeout="90"
+			responseTimeout="90" knownHostsFile="sftp_known_hosts">
+			<reconnection>
+				<reconnect frequency="5000" count="5" />
+			</reconnection>
+		</sftp:connection>
+	</sftp:config>
+	<http:request-config
+		name="HTTPS_OAuth_MarketingCloud"
+		doc:name="HTTP Request configuration"
+		doc:id="fe2e1cd9-c4f0-475a-8a61-56b1256b5676">
+		<http:request-connection
+			host="mc1g-l7wnmr9qbctgw4zlwn0v-1q.auth.marketingcloudapis.com"
+			protocol="HTTPS" />
+	</http:request-config>
+	<http:request-config
+		name="HTTP_Request_configuration_API_Auth"
+		doc:name="HTTP Request configuration"
+		doc:id="1f1ad2d9-a90c-48bc-b62e-4fb2817afa2e"
+		basePath="${sfcc.import.basepath}">
+		<http:request-connection protocol="HTTPS"
+			host="${sfcc.host.name}" />
+		<http:default-headers>
+			<http:default-header key="Authorization"
+				value='#["Bearer " ++ vars.token replace "\"" with ""]' />
+		</http:default-headers>
+	</http:request-config>
+	<http:request-config
+		name="HTTP_Request_configuration_stage_API_Auth"
+		doc:name="HTTP Request configuration"
+		doc:id="6e53d1da-ad66-4efe-941d-9127605b52b2"
+		basePath="${sfcc.import.basepath}" responseTimeout="90000">
+		<http:request-connection protocol="HTTPS"
+			host="${sfcc.host.name.stage}">
+		</http:request-connection>
+		<http:default-headers>
+			<http:default-header key="Authorization"
+				value='#["Bearer " ++ vars.token replace "\"" with ""]' />
+		</http:default-headers>
+	</http:request-config>
+	<http:request-config
+		name="HTTP_Request_configuration_Token"
+		doc:name="HTTP Request configuration"
+		doc:id="efb7baf1-d757-404c-8d53-fce0b0263cee">
+		<http:request-connection
+			host="${sfcc.auth.base}" protocol="HTTPS" />
+	</http:request-config>
+	<cloudhub:config name="CloudHub_Config"
+		doc:name="CloudHub Config"
+		doc:id="b87b2f10-8cbe-46d8-9f62-169e151a23c9">
+		<cloudhub:connection
+			username="${credentials.cloudhubuser}"
+			password="${secure::credentials.cloudhubpw}"
+			environment="${cloudhub.alert.env}"
+			anypointPlatformUrl="https://eu1.anypoint.mulesoft.com" />
+	</cloudhub:config>
+	<configuration doc:name="Configuration"
+		doc:id="be8808d2-3a4e-4e3a-9f6e-469df8d49b58"
+		defaultErrorHandler-ref="globalError_Handler" />
+	<salesforce:sfdc-config name="Salesforce_Config"
+		doc:name="Salesforce Config"
+		doc:id="eac93c23-0dc2-4901-938c-8ead1d76f198">
+		<salesforce:basic-connection
+			username="${sfsc.username}" password="${secure::sfsc.pw}"
+			securityToken="${secure::sfsc.security.token}"
+			url="${sfsc.login.url}" connectionTimeout="90000">
+			<reconnection>
+				<reconnect frequency="5000" count="5" />
+			</reconnection>
+		</salesforce:basic-connection>
+	</salesforce:sfdc-config>
+	<secure-properties:config
+		name="Secure_Properties_Config" doc:name="Secure Properties Config"
+		doc:id="5845894e-518c-4eb7-bd66-3a53133df2c0"
+		file="secured_${env.name}.properties" key="${secure.key}" />
+	<configuration-properties
+		doc:name="Configuration properties"
+		doc:id="7bd3a48b-2bb0-4012-8d95-cc5c09712d13"
+		file="secured_${env.name}.properties" />
+
+	<global-property doc:name="Global Property"
+		doc:id="a36c56ee-f43c-4bff-b261-c0607797799d" name="secure.key"
+		value="replaceMe" />
+	<global-property doc:name="Global Property"
+		doc:id="c9eadf2b-3c00-47f0-b687-937c15580a7a" name="env.name"
+		value="replaceMe" />
+	<sfdc-marketing-cloud:config
+		name="Salesforce_Marketing_Cloud_Config"
+		doc:name="Salesforce Marketing Cloud Config"
+		doc:id="cf2074a2-ef77-4c50-9d04-5b3aef6f4a09">
+		<sfdc-marketing-cloud:basic-connection
+			username="#[vars.sfmcClientId]" password="#[vars.sfmcClientSecret]"
+			serviceUrl="https://mc1g-l7wnmr9qbctgw4zlwn0v-1q.soap.marketingcloudapis.com/Service.asmx" />
+	</sfdc-marketing-cloud:config>
+	<error-handler name="globalError_Handler"
+		doc:id="49d5e496-27c7-49b8-815a-00d2b37901b4">
+		<on-error-propagate enableNotifications="true"
+			logException="true" doc:name="On Error Propagate"
+			doc:id="fbbda0f0-e045-419b-b7ed-53b75135a96b">
+			<logger level="ERROR" doc:name="Logger"
+				doc:id="9abef766-7667-4a4b-bfa7-3d593f903bd5"
+				message="### Error - Original Payload: ###" />
+			<logger level="ERROR" doc:name="Logger"
+				doc:id="172eef33-1c3d-4f54-b634-a5bfb56ed397"
+				message="#[vars.payload_ori]" />
+			<cloudhub:create-notification
+				domain="${cloudhub.alert.domain}" doc:name="Create Alert"
+				doc:id="a2394fa2-7f1b-480f-bd43-50aaddcb2ec4"
+				config-ref="CloudHub_Config">
+				<reconnect frequency="3000" count="3" />
+				<cloudhub:message><![CDATA[#["Alert timestamp " ++ (now() as String) ++ ": " ++ (error.detailedDescription default "" as String)]]]></cloudhub:message>
+			</cloudhub:create-notification>
+		</on-error-propagate>
+	</error-handler>
+	<flow name="globalFlow"
+		doc:id="0fd32e30-f5a8-4fd3-9f4d-b61ce43e9d3a">
+		<scheduler doc:name="Scheduler"
+			doc:id="37d91a16-ea5f-4d39-ab87-a5c6df082776">
+			<scheduling-strategy>
+				<fixed-frequency frequency="30000" />
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="Flow Reference"
+			doc:id="b4634409-5362-4f37-9d22-5fdb79642581"
+			name="global.doAuthenticate" />
+	</flow>
+	<sub-flow name="global.doAuthenticate"
+		doc:id="8f02d26c-a8e2-4407-9018-e851aa2cc512">
+		<os:retrieve doc:name="Retrieve"
+			doc:id="43600dd2-de93-4aa9-b17b-4dfe05034bc4" key="sfccAuthToken">
+			<os:default-value><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"timestamp": 0,
+	"token": "EMPTY"
+}]]]></os:default-value>
+		</os:retrieve>
+		<logger level="DEBUG" doc:name="Logger"
+			doc:id="60e94a99-f9b4-4704-be15-c9333f21c976"
+			message='#["\n Do Authenticate"]' />
+		<choice doc:name="Choice"
+			doc:id="a3179f45-722c-416d-ab28-b4b0e3df0db4">
+			<when
+				expression="#[( (now() as Number) - (payload.timestamp as Number))  &gt; ((5 * 60) as Number)]">
+				<set-payload
+					value="#[%dw 2.0&#10;import * from dw::core::Binaries&#10;&#10;output application/json&#10;---&#10;{&#10;	&quot;sfccUserCredential&quot;: toBase64(p('sfcc.clientId')++&quot;:&quot;++ (p('secure::sfcc.clientSecret') as String))&#10;}]"
+					doc:name="base64 credentials"
+					doc:id="b43cab2f-c7b0-4672-b50b-760852e1fdb0" />
+				<http:request method="POST"
+					doc:name="/POST bearerTokenStage"
+					doc:id="d77c4583-9765-4e99-8e1a-dd894f55ad61"
+					config-ref="HTTP_Request_configuration_Token"
+					path="${sfcc.oauth2_url}">
+					<reconnect frequency="3000" count="3" />
+					<http:body><![CDATA[#['grant_type=client_credentials']]]></http:body>
+					<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Basic " ++ message.payload.sfccUserCredential,
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+					<http:query-params><![CDATA[#[output application/java
+---
+{
+	"client_id" : "${sfcc.clientId}"
+}]]]></http:query-params>
+				</http:request>
+				<set-variable value="#[payload.access_token]"
+					doc:name="Set bearerToken"
+					doc:id="6f96caf8-220b-4497-92a9-2490cdbe1a56"
+					variableName="bearerToken" />
+				<crypto:jce-encrypt-pbe
+					doc:id="3aa8ffc5-cb5a-48e0-9f38-fa42cae4a69a"
+					password="${secure::objectstore.password}" target="bearerToken"
+					doc:name="Jce encrypt pbe">
+					<crypto:content><![CDATA[#[vars.bearerToken]]]></crypto:content>
+				</crypto:jce-encrypt-pbe>
+				<os:store doc:name="Store"
+					doc:id="9f85a8c7-68dd-41db-abac-f74ba90388e3" key="sfccAuthToken">
+					<os:value><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+
+output application/json
+---
+{
+	"timestamp": (now() as Number),
+	"token": toBase64(vars.bearerToken)
+}]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="a52db548-7704-4b77-aa8c-23079134cc80"
+					message='"Token refreshed"' />
+			</when>
+			<otherwise>
+				<logger level="DEBUG" doc:name="Logger"
+					doc:id="6e36e393-dca5-444e-81a6-74a1b27a9646" message="#[payload]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

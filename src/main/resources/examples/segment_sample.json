@@ -1,0 +1,24 @@
+{
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+        "Property": [
+            {
+                "Name": "segment_id",
+                "Value": "2222"
+            }
+        ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+}

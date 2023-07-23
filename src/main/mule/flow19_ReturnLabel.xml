@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:os="http://www.mulesoft.org/schema/mule/os"
+  xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto"
+  xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd"
+>
+  <flow
+    name="flow19.ReturnLabel"
+    doc:id="0748e6ae-b95c-486a-8291-c8f4b9e4a1c2"
+    maxConcurrency="1"
+    initialState="started"
+  >
+    <scheduler
+      doc:name="Scheduler"
+      doc:id="b30e44d3-4716-458e-a633-22477a5cbd16"
+    >
+      <scheduling-strategy>
+        <fixed-frequency
+          frequency="15"
+          timeUnit="MINUTES"
+          startDelay="1" />
+      </scheduling-strategy>
+    </scheduler>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="49618a71-35d0-4a57-9fce-1274888dedc6"
+      message="Flow 19 Return Label - Started" />
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="ee0e7935-dc6e-4166-86c2-e54d9794af16" >
+      <os:retrieve doc:name="Retrieve Token" doc:id="e7b8199e-b567-4468-a655-9cf0280c3748" key="sfccAuthToken" target="token" />
+    </until-successful>
+    <crypto:jce-decrypt-pbe
+      doc:name="Jce decrypt pbe"
+      doc:id="22c06674-6e72-4e68-a411-dc5390e4bb70"
+      password="${secure::objectstore.password}"
+      target="token"
+    >
+      <crypto:content><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+output application/java
+---
+fromBase64(vars.token.token)]]]></crypto:content>
+    </crypto:jce-decrypt-pbe>
+    <sftp:list
+      doc:name="List Directory"
+      doc:id="78c6ac68-fcab-4e68-ae4a-303fb74edd54"
+      config-ref="SFTP_Config"
+      directoryPath="#[p('sftp.path.return')]"
+    >
+      <reconnect
+        frequency="5000"
+        count="5" />
+      <sftp:matcher filenamePattern="{[a-zA-Z]*.pdf}" />
+    </sftp:list>
+    <foreach
+      doc:name="For Each"
+      doc:id="098f60e7-5cde-490a-9f1b-158aeac2779f"
+    >
+      <choice
+        doc:name="Choice"
+        doc:id="fb2618ec-7dbb-40df-b963-0cfb27a3c091"
+      >
+        <when expression='#[(attributes.path as String) endsWith ".pdf"]'>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="df5153bb-aca5-4dfd-a396-62ab9c79bb30"
+            message='#["Processing  =&gt; " ++ attributes.path default "nothing found"]' />
+          <set-variable
+            value="#[attributes.fileName]"
+            doc:name="Set fileNameOriginal"
+            doc:id="8e62199f-b0b6-4ac2-9a1e-9200999dbf4c"
+            variableName="fileNameOriginal" />
+					<choice doc:name="Choice" doc:id="b9e074d5-6ca1-43b0-8560-25cbc3218cd7">
+						<when expression="#[import * from dw::core::Strings&#10;---&#10;(substringBefore(attributes.fileName, &quot;_&quot;)) == 'DE']">
+							<set-variable value='avoury.de' doc:name="siteId (rehnus legacy DE)" doc:id="8b981131-c35e-47e1-85cc-dc97785cb49d" variableName="siteId" />
+							<set-variable value="#[import * from dw::core::Strings&#10;&#10;---&#10;p('businessOrganization.siteId.' ++  vars.siteId) ++ &quot;_&quot; ++ substringAfter(attributes.fileName, &quot;_&quot;)]" doc:name="Set fileName (legacy)" doc:id="bcf656d2-1036-4a35-969d-4e0a3c376445" variableName="fileName" />
+						</when>
+						<when expression="#[import * from dw::core::Strings&#10;---&#10;(substringBefore(attributes.fileName, &quot;_&quot;)) == 'AT']">
+							<set-variable value='avoury.at' doc:name="siteId (rehnus legacy AT)" doc:id="8d4d9df0-ba34-45c4-a3b9-66871a093386" variableName="siteId" />
+							<set-variable value="#[import * from dw::core::Strings&#10;&#10;---&#10;p('businessOrganization.siteId.' ++  vars.siteId) ++ &quot;_&quot; ++ substringAfter(attributes.fileName, &quot;_&quot;)]" doc:name="Set fileName (legacy)" doc:id="f62c2880-35f6-46e6-b3ca-bb76ba69d660" variableName="fileName" />
+						</when>
+						<otherwise >
+							<set-variable value='#[import * from dw::core::Strings&#10;&#10;---&#10;lower(substringBefore(attributes.fileName, "_") ++ "." ++ substringBefore(substringAfter(attributes.fileName, "_"), "_"))]' doc:name="siteId" doc:id="8aa7b3f7-9e25-43ce-99a6-482d08cce749" variableName="siteId" />
+							<set-variable value="#[import * from dw::core::Strings&#10;&#10;---&#10;p('businessOrganization.siteId.' ++  vars.siteId) ++ &quot;_&quot; ++ substringAfter(substringAfter(attributes.fileName, &quot;_&quot;), &quot;_&quot;)]" doc:name="Set fileName" doc:id="c984a054-3218-49d6-aef1-a0cb766673b3" variableName="fileName" />
+						</otherwise>
+					</choice>
+					<set-variable
+            value='#[attributes.fileName[3 to (sizeOf(attributes.fileName)-1)]]'
+            doc:name="Set filePath"
+            doc:id="95d44d73-40d2-4056-84be-ed5edb01d4ac"
+            variableName="filePath" />
+					<set-variable
+            value="#[%dw 2.0
+output application/java
+import * from dw::core::Strings
+
+---
+p('internationalisation.shopSite.' ++ lower(substringBefore(attributes.fileName, &quot;_&quot;)))]"
+            doc:name="Set shopSite"
+            doc:id="7e635995-fd68-4f6c-8fdb-161bdf3e0ebb"
+            variableName="shopSite" />
+          <until-successful
+            maxRetries="6"
+            doc:name="Until Successful"
+            doc:id="5dd89e3f-a13e-41d1-aa80-29b330ce3a35"
+            millisBetweenRetries="30000"
+          >
+            <sftp:read
+              doc:name="Read Single File"
+              doc:id="5eb2a915-5a16-4517-9561-5ebfbff566e3"
+              config-ref="SFTP_Config"
+              path="#[p('sftp.path.return') ++ &quot;/&quot; ++ vars.fileNameOriginal]"
+              target="result"
+            >
+              <ee:repeatable-file-store-stream bufferUnit="MB" />
+              <reconnect
+                frequency="5000"
+                count="5" />
+            </sftp:read>
+            <set-variable
+              value="#[vars.result]"
+              doc:name="pdfFile"
+              doc:id="f794f3d7-1a7a-43fb-8e90-124ad02a8cc6"
+              variableName="pdfFile" />
+            <http:request
+              method="POST"
+              doc:name="/POST ReturnLabel"
+              doc:id="d0251af2-ad30-4923-acd5-718fdef6401c"
+              config-ref="HTTP_Request_configuration_API_Auth"
+              path='#["/src/import/returnlabel/" ++ vars.fileName]'
+              responseTimeout="90000"
+            >
+              <reconnect
+                frequency="5000"
+                count="5" />
+              <http:body><![CDATA[#[vars.pdfFile]]]></http:body>
+            </http:request>
+          </until-successful>
+          <sftp:delete
+            doc:name="Delete File"
+            doc:id="de55cdaa-c73c-424d-8fd9-93274694d0c1"
+            config-ref="SFTP_Config"
+            path="#[p('sftp.path.return') ++ &quot;/&quot; ++ vars.fileNameOriginal]"
+          >
+            <reconnect
+              frequency="5000"
+              count="5" />
+          </sftp:delete>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="eee5ecf1-bc08-42e5-adaa-fff370775d73"
+            message='#["Flow 19 Return Label - Finished:  =&gt; " ++ vars.fileNameOriginal default "nothing found"]' />
+        </when>
+      </choice>
+    </foreach>
+  </flow>
+</mule>

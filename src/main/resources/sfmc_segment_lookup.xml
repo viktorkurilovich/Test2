@@ -1,0 +1,42 @@
+<soap:Envelope>
+ <soap:Header>
+    <wsa:Action>RetrieveResponse</wsa:Action>
+    <wsa:MessageID>urn:uuid:aa368517-e4c4-4570-a92d-5ad668d0d67f</wsa:MessageID>
+    <wsa:RelatesTo>urn:uuid:b52b2894-1c22-4577-b38a-7bbee5db68d3</wsa:RelatesTo>
+    <wsa:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:To>
+    <wsse:Security>
+      <wsu:Timestamp wsu:Id="Timestamp-afcf43e4-51fa-42be-89cb-275c228b7c03">
+        <wsu:Created>2019-04-08T08:59:41Z</wsu:Created>
+        <wsu:Expires>2019-04-08T09:04:41Z</wsu:Expires>
+      </wsu:Timestamp>
+    </wsse:Security>
+  </soap:Header>
+  <soap:Body>
+    <RetrieveResponseMsg xmlns="http://exacttarget.com/wsdl/partnerAPI">
+      <OverallStatus>OK</OverallStatus>
+      <RequestID>d5a4ece6-7251-4718-a590-067dfad1af49</RequestID>
+      <Results xsi:type="DataExtensionObject">
+        <PartnerKey xsi:nil="true"/>
+        <ObjectID xsi:nil="true"/>
+        <Type>DataExtensionObject</Type>
+        <Properties>
+          <Property>
+            <Name>segment_id</Name>
+            <Value>1000</Value>
+          </Property>
+        </Properties>
+      </Results>
+      <Results xsi:type="DataExtensionObject">
+        <PartnerKey xsi:nil="true"/>
+        <ObjectID xsi:nil="true"/>
+        <Type>DataExtensionObject</Type>
+        <Properties>
+          <Property>
+            <Name>segment_id</Name>
+            <Value>2222</Value>
+          </Property>
+        </Properties>
+      </Results>
+    </RetrieveResponseMsg>
+  </soap:Body>
+</soap:Envelope>
