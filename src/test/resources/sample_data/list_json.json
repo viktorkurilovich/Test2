@@ -1,0 +1,29 @@
+[
+    {
+        "Owner": null,
+        "PartnerKey": null,
+        "ObjectID": null,
+        "CustomerKey": null,
+        "ModifiedDate": null,
+        "Properties": {
+            "Property": [
+                {
+                    "Name": "Kundennummer",
+                    "Value": "00011002"
+                },
+                {
+                    "Name": "Optin_Confirmed",
+                    "Value": "True"
+                },
+                {
+                    "Name": "Optin_Date",
+                    "Value": "7/8/2019 12:00:00 AM"
+                },
+                {
+                    "Name": "Lead_Source",
+                    "Value": "Webshop"
+                }
+            ]
+        }
+    }
+]

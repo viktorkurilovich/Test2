@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+  xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto"
+  xmlns:os="http://www.mulesoft.org/schema/mule/os"
+  xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns:sfdc-marketing-cloud="http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud/current/mule-sfdc-marketing-cloud.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+  <flow
+    name="flow16.CustomerSegmentsCampaigns"
+    doc:id="ca98f109-3ab4-4f77-8db2-a6f7ff10ab6e"
+    maxConcurrency="1"
+    initialState="stopped"
+  >
+    <scheduler
+      doc:name="Scheduler"
+      doc:id="3815b925-741e-4fff-8dbe-3d8d7f724971"
+    >
+      <scheduling-strategy>
+        <fixed-frequency
+          frequency="3600"
+          timeUnit="MINUTES"
+          startDelay="1" />
+      </scheduling-strategy>
+    </scheduler>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="e137f2b3-d390-4df5-b187-2c8b98c125f0"
+      message="Flow16 CustomerSegementsCampaigns -  Started" />
+    <set-variable
+      value="#[p('internationalisation.shopSite.active') splitBy(/[,]/)]"
+      doc:name="Set active Shopsites"
+      doc:id="2d9045bf-0999-4e83-bef2-acb356bdbea4"
+      variableName="activeShopsite" />
+    <foreach
+      doc:name="For Each"
+      doc:id="165d3012-c96e-46f8-8806-c3800fc43606"
+      collection="#[vars.activeShopsite]"
+    >
+      <set-variable
+        value="#[payload]"
+        doc:name="Set VTWEG"
+        doc:id="af7df7e1-f44d-497b-bdfa-56f5eedb052d"
+        variableName="VTWEG" />
+      <set-variable value="#[p('sfmc.client.id.' ++ vars.VTWEG) default &quot;&quot;]" doc:name="sfmcClientId" doc:id="83c313f3-0a7f-4e93-8d57-02c3b3e60dc6" variableName="sfmcClientId" />
+			<set-variable value="#[p('sfmc.client.secret.' ++ vars.VTWEG) default &quot;&quot;]" doc:name="sfmcClientSecret" doc:id="a7bcba23-a003-4d4f-9260-61afc86512aa" variableName="sfmcClientSecret" />
+			<set-variable
+        value="#[p('internationalisation.shopSite.' ++ vars.VTWEG) default &quot;&quot;]"
+        doc:name="Set shopSite"
+        doc:id="b6ec3125-5a86-43ab-8cc7-17716def9568"
+        variableName="shopSite" />
+      <flow-ref
+        doc:name="Flow Reference"
+        doc:id="acedf9a5-bf3e-431b-814a-6453a7d0c111"
+        name="flow16.GetCustomerSegmentsCampaigns" />
+    </foreach>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="27252627-519f-4172-8a0a-1fcc99fbf4ee"
+      message="Flow16 CustomerSegementsCampaigns -  Ended" />
+  </flow>
+  <flow
+    name="flow16.GetCustomerSegmentsCampaigns"
+    doc:id="d0e7775f-470a-4240-a58b-3a53835fb09e"
+  >
+    <set-variable
+      value="#[&quot;SELECT segment_id, segment_name, delete_in_SFCC_flag, 'CampaignName', 'StartDate', 'EndDate', 'KampagnenArt', 'KampagnenMechanism'  FROM 'DataExtensionObject[&quot; ++ p('internationalisation.marketingCloud.externalKey.Segment_Lookup.' ++ vars.VTWEG) ++ &quot;]'&quot;]"
+      doc:name="Set SQL-Statement"
+      doc:id="d5a5d82f-39d1-4c59-b671-9251eb5bbc65"
+      variableName="sqlStatement" />
+    <sfdc-marketing-cloud:retrieve
+      doc:name="Retrieve Campaigns"
+      doc:id="168b44cc-b71e-4c56-87af-332f4c9df284"
+      config-ref="Salesforce_Marketing_Cloud_Config"
+    >
+      <reconnect
+        frequency="5000"
+        count="5" />
+      <sfdc-marketing-cloud:query><![CDATA[#[vars.sqlStatement]]]></sfdc-marketing-cloud:query>
+    </sfdc-marketing-cloud:retrieve>
+    <set-variable
+      value="#[payload]"
+      doc:name="Set payload_Campaigns"
+      doc:id="a752fb64-57ca-4490-81bc-df483373de83"
+      variableName="payload_Campaigns" />
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="84f147db-ecf1-491c-93ea-e61deeba9222" >
+      <os:retrieve doc:name="Retrieve Token" doc:id="5d01b2d2-d1c5-4c9c-ad0a-db6f8f4088c6" key="sfccAuthToken" target="token" />
+    </until-successful>
+    <crypto:jce-decrypt-pbe
+      doc:name="Jce decrypt pbe"
+      doc:id="fa39561b-b398-45dd-95ed-b1b998d3e755"
+      password="${secure::objectstore.password}"
+      target="token"
+    >
+      <crypto:content><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+output application/java
+---
+fromBase64(vars.token.token)]]]></crypto:content>
+    </crypto:jce-decrypt-pbe>
+    <flow-ref
+      doc:name="Flow Reference Reset Segments"
+      doc:id="f505aa00-89d5-41ec-810e-04d1f526acd1"
+      name="flow16.ResetCustomerSegmentsCampaigns"
+      target="subflowPayload" />
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="6b3d044e-7758-4baa-89ff-f3fce1d41d84"
+      message="#[payload]" />
+    <ee:transform
+      doc:name="Transform Message"
+      doc:id="a6943c7d-ec8e-4068-82a5-a19605f3ed95"
+    >
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/xml writeDeclaration=true
+---
+{
+	"customer-groups" @(xmlns: "http://www.demandware.com/xml/impex/customergroup/2007-06-30"): {
+			(payload map (object, i) -> {
+				"customer-group" @("group-id": object.Properties.Property[0].Value):{
+					description: object.Properties.Property[1].Value,
+					"custom-attributes": null
+			}
+		}
+	)			
+	}
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="cc4b5484-704f-4d9f-add1-83bd5f78a27a"
+      message='#["DEBUG-OUTPUT:/n"]' />
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="c92c4ad0-05b6-44d0-942b-3f120cb4ccd7"
+      message="#[payload]" />
+    <set-payload
+      value="#[vars.payload_Campaigns]"
+      doc:name="Set Payload"
+      doc:id="f662aad4-6520-4280-9345-c4e202f0d050" />
+    <scatter-gather
+      doc:name="Scatter-Gather"
+      doc:id="63a081f7-ca0a-4bb7-b7e6-dd97087a5e33"
+    >
+      <route>
+        <choice
+          doc:name="Choice"
+          doc:id="7c228a97-6246-4677-b64b-e5d959d39a91"
+        >
+          <when expression='#[sizeOf(vars.payload_Campaigns filter ($.Properties.Property[2].Value == "True")) != 0]'>
+            <ee:transform
+              doc:name="Transform Message"
+              doc:id="b34684ab-c391-4f44-8eb4-c93f11285778"
+            >
+              <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	"customer-groups" @(xmlns: "http://www.demandware.com/xml/impex/customergroup/2007-06-30"): {
+			(vars.payload_Campaigns filter ($.Properties.Property[2].Value == "True") map (object, i) -> {
+				"customer-group" @("group-id": object.Properties.Property[0].Value):{
+					description: object.Properties.Property[1].Value,
+					"custom-attributes": null
+					}
+				}
+			)		
+	}
+}]]></ee:set-payload>
+              </ee:message>
+            </ee:transform>
+            <logger
+              level="INFO"
+              doc:name="Logger"
+              doc:id="8dcf2bde-9acd-41c9-b11b-f3ee7e7f6ba1"
+              message="#[payload]" />
+            <set-variable
+              value='#[uuid() ++ "_customerGroups_delete.xml"]'
+              doc:name="ImportFileName"
+              doc:id="9d5755aa-b065-4c77-99fb-25c9838ec688"
+              variableName="fileName" />
+            <scatter-gather
+              doc:name="Scatter-Gather"
+              doc:id="3edc0bc3-a2c3-4db5-b890-3b2c05e80c5b"
+            >
+              <route>
+                <http:request
+                  method="POST"
+                  doc:name="/POST CustomerGroupsImport"
+                  doc:id="da28be74-2bb7-45e6-96a2-3edd7e89fdbf"
+                  path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]"
+                  config-ref="HTTP_Request_configuration_API_Auth"
+                >
+                  <reconnect
+                    frequency="5000"
+                    count="5" />
+                </http:request>
+              </route>
+              <route>
+                <http:request
+                  method="POST"
+                  doc:name="/POST CustomerGroupsImport"
+                  doc:id="64c99bb1-a746-426a-9b08-1c1d69126c0a"
+                  path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]"
+                  config-ref="HTTP_Request_configuration_stage_API_Auth"
+                >
+                  <reconnect
+                    frequency="5000"
+                    count="5" />
+                </http:request>
+              </route>
+            </scatter-gather>
+          </when>
+          <otherwise>
+            <logger
+              level="INFO"
+              doc:name="Logger"
+              doc:id="ec255116-c887-467e-8d3a-b0a766c6ff57"
+              message="No customer groups to delete" />
+          </otherwise>
+        </choice>
+
+      </route>
+      <route>
+        <ee:transform
+          doc:name="Transform Message"
+          doc:id="55117fd2-349e-47c6-b8ad-afb98d7b61e5"
+        >
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+
+payload filter ($.Properties.Property[2].Value == "False")]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <foreach
+          doc:name="For Each"
+          doc:id="656c6ab0-23cb-47c6-95ed-f8dc54b3a411"
+          collection="#[payload]"
+        >
+          <ee:transform
+            doc:name="Transform Message Extract DE_Names &amp; ID"
+            doc:id="dcf96460-afed-4b22-9cee-8b15138592d3"
+          >
+            <ee:message>
+              <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+            <ee:variables>
+              <ee:set-variable variableName="DE_Name"><![CDATA[%dw 2.0
+output text/plain
+---
+payload.Properties.Property[1].Value]]></ee:set-variable>
+              <ee:set-variable variableName="DE_Id"><![CDATA[%dw 2.0
+output text/plain
+---
+payload.Properties.Property[0].Value]]></ee:set-variable>
+              <ee:set-variable variableName="DE_Delete_Flag"><![CDATA[%dw 2.0
+output text/plain
+---
+payload.Properties.Property[2].Value]]></ee:set-variable>
+              <ee:set-variable variableName="payloadCurrentGroup"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+
+            </ee:variables>
+          </ee:transform>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="ac5970f2-8614-4d96-8cf7-23f091d294f6"
+            message="#[payload]" />
+          <set-variable
+            value="#[&quot;SELECT PersonEmail, SFCC_Customer_Number__pc, PersonContactId  FROM 'DataExtensionObject[&quot; ++ vars.DE_Name as String ++ &quot;]'&quot;]"
+            doc:name="SQL_Statement_2"
+            doc:id="bc776853-609b-4df2-bd95-7ec9fd5b043f"
+            variableName="SQL_Statement_2" />
+          <sfdc-marketing-cloud:retrieve
+            doc:name="Retrieve Customer Lists"
+            doc:id="dfd73600-e67f-4afd-b4e1-5e0438b1ad55"
+            config-ref="Salesforce_Marketing_Cloud_Config"
+          >
+            <reconnect
+              frequency="5000"
+              count="5" />
+            <sfdc-marketing-cloud:query><![CDATA[#[vars.SQL_Statement_2 as String]]]></sfdc-marketing-cloud:query>
+          </sfdc-marketing-cloud:retrieve>
+          <scatter-gather
+            doc:name="Scatter-Gather"
+            doc:id="4a9a9195-8ef3-4f18-9d7e-700e1ed5088e"
+          >
+            <route>
+              <choice
+                doc:name="Choice"
+                doc:id="1499e63d-0a76-44dc-acb0-9354147b5fa5"
+              >
+                <when expression="#[sizeOf(payload) != 0]">
+                  <ee:transform
+                    doc:name="Transform Message"
+                    doc:id="22a809d1-3deb-43fc-9f1f-48b97eb8d605"
+                  >
+                    <ee:message>
+                      <ee:set-payload><![CDATA[%dw 2.2
+output application/xml
+ns ns0 http://www.demandware.com/xml/impex/customergroup/2007-06-30
+
+import * from dw::core::Strings 
+
+
+---
+	"customer-groups" @(xmlns: "http://www.demandware.com/xml/impex/customergroup/2007-06-30"): {
+		(vars.payload_Campaigns filter ($.Properties.Property[2].Value == "False") map (object, i) -> {
+			"customer-group" @("group-id": object.Properties.Property[0].Value): {
+				description: object.Properties.Property[1].Value,
+				"custom-attributes": {
+					("custom-attribute" @("attribute-id": "campaignName"): {
+						"value": object.Properties.Property[3].Value, 
+					}) if (object.Properties.Property[3].Value != null and object.Properties.Property[3].Value != ""),
+					("custom-attribute" @("attribute-id": "campaignFrom"): {
+						"value": substringBefore(object.Properties.Property[4].Value, " ") as Date {format: "M/d/yyyy"} as String {format: "yyyy-MM-dd"} ++ "T00:00:00.000Z",
+					}) if (object.Properties.Property[4].Value != null and object.Properties.Property[4].Value != ""),
+					("custom-attribute" @("attribute-id": "campaignTo"): {
+						"value": substringBefore(object.Properties.Property[5].Value, " ") as Date {format: "M/d/yyyy"} as String {format: "yyyy-MM-dd"} ++ "T00:00:00.000Z",
+					}) if (object.Properties.Property[5].Value != null and object.Properties.Property[5].Value != ""),
+					("custom-attribute" @("attribute-id": "campaignType"): {
+						"value": object.Properties.Property[6].Value, 
+					}) if (object.Properties.Property[6].Value != null and object.Properties.Property[6].Value != ""),
+					("custom-attribute" @("attribute-id": "campaignDesc"): {
+						"value": object.Properties.Property[7].Value, 
+					}) if (object.Properties.Property[7].Value != null and object.Properties.Property[7].Value != "")
+				}
+			}
+		}),
+		(payload map (object, j) -> {
+			"group-assignment" @("group-id": vars.DE_Id, "customer-no": object.Properties.Property[1].Value): {
+			}
+		})
+}
+]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                    </ee:variables>
+
+                  </ee:transform>
+                  <logger
+                    level="INFO"
+                    doc:name="Logger"
+                    doc:id="d4b7c36c-ce54-4ed5-bf54-ee43462fcc58"
+                    message='#["Retrieve Customer Lists:/n"]' />
+                  <logger
+                    level="INFO"
+                    doc:name="Logger"
+                    doc:id="2c9520e1-704a-4028-a036-8df33f9540b5"
+                    message="#[payload]" />
+                  <set-variable
+                    value='#[uuid() ++ "_customerLists_upsert.xml"]'
+                    doc:name="Set ImportFileName"
+                    doc:id="832b8d71-45df-49dc-9521-259b9e1845a2"
+                    variableName="fileName" />
+                  <scatter-gather
+                    doc:name="Scatter-Gather"
+                    doc:id="4b4aa8e3-ba31-47e5-9fa7-712cc7815093"
+                  >
+                    <route>
+                      <http:request
+                        method="POST"
+                        doc:name="/POST CustomerGroupsImport"
+                        doc:id="6606fbdd-3699-482f-879a-cdda3abe0072"
+                        path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]"
+                        config-ref="HTTP_Request_configuration_API_Auth"
+                      >
+                        <reconnect
+                          frequency="5000"
+                          count="5" />
+                      </http:request>
+                    </route>
+                    <route>
+                      <http:request
+                        method="POST"
+                        doc:name="/POST CustomerGroupsImport Staging"
+                        doc:id="5c16870f-1856-4b71-af23-7409ab052651"
+                        path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]"
+                        config-ref="HTTP_Request_configuration_stage_API_Auth"
+                      >
+                        <reconnect
+                          frequency="5000"
+                          count="5" />
+                      </http:request>
+                    </route>
+                  </scatter-gather>
+                </when>
+                <otherwise>
+                  <logger
+                    level="INFO"
+                    doc:name="Logger"
+                    doc:id="2ac45e79-3511-4aed-bfcb-0107d1109d57"
+                    message='#["No Contacts in DE: " ++ vars.DE_Name]' />
+                </otherwise>
+              </choice>
+            </route>
+            <route>
+              <set-variable
+                value="#[%dw 2.0 output application/json --- payload]"
+                doc:name="Set payloadCurrentGroupMember "
+                doc:id="638ec8ec-9083-4c90-b1c4-c9d56cc20d4f"
+                variableName="payloadCurrentGroupMember" />
+              <logger
+                level="INFO"
+                doc:name="Logger"
+                doc:id="497a100e-755c-4dbe-ba73-a967d418ef99"
+                message="#[vars.payloadCurrentGroup]" />
+              <logger
+                level="INFO"
+                doc:name="Logger"
+                doc:id="5f01e740-f252-42cc-9012-d5ad859b0bae"
+                message="#[vars.payloadCurrentGroupMember]" />
+              <salesforce:upsert
+                doc:name="Upsert Campaign"
+                doc:id="dcfe675d-a177-43ff-b157-3586af975428"
+                externalIdFieldName="External_Segment_ID__c"
+                objectType="Campaign"
+                config-ref="Salesforce_Config"
+              >
+                <reconnect
+                  frequency="5000"
+                  count="5" />
+                <salesforce:records><![CDATA[#[%dw 2.2
+output application/java
+
+import * from dw::core::Strings
+
+fun getTypeFromString(str) = 
+	if (str == null or (sizeOf(str) <2)) 
+		"Other"
+	else if (str == "Event")
+		str
+	else if (str == "Demo Signup / Trial")
+		str
+	else if (str == "Email")
+		str
+	else if (str == "Referral Program")
+		str
+	else if (str == "Search")
+		str
+	else if (str == "Social Media")
+		str
+	else if (str == "Thought Leadership")
+		str
+	else if (str == "Website Direct")
+		str
+	else 
+		"Other"
+
+---
+[
+	{
+		Name: vars.payloadCurrentGroup.Properties.Property[1].Value,
+		Type: getTypeFromString(vars.payloadCurrentGroup.Properties.Property[6].Value),
+		Status: "Eligibile", // nach rücksprache mit skloeters.
+		(StartDate: substringBefore(vars.payloadCurrentGroup.Properties.Property[4].Value default "", " ") as Date {format: "M/d/yyyy"}) if (vars.payloadCurrentGroup.Properties.Property[4].Value != null and sizeOf(vars.payloadCurrentGroup.Properties.Property[4].Value) >=8),
+		(EndDate: substringBefore(vars.payloadCurrentGroup.Properties.Property[5].Value default "", " ") as Date {format: "M/d/yyyy"}) if (vars.payloadCurrentGroup.Properties.Property[5].Value != null and sizeOf(vars.payloadCurrentGroup.Properties.Property[5].Value) >=8),
+		Campaign_Mechanism__c: vars.payloadCurrentGroup.Properties.Property[7].Value,
+		Kampagnenart__c: vars.payloadCurrentGroup.Properties.Property[6].Value,
+		External_Segment_ID__c: vars.payloadCurrentGroup.Properties.Property[0].Value,
+	}
+]]]]></salesforce:records>
+              </salesforce:upsert>
+              <ee:transform
+                doc:name="Transform Message"
+                doc:id="3cac230b-8500-42de-8808-c13f40a94b73"
+              >
+                <ee:message>
+                  <ee:set-payload><![CDATA[%dw 2.2
+output application/json
+---
+payload.items map (object, i) -> 
+{
+	objectType: "Campaign",
+	id: object.payload.id,
+	success: object.payload.success,
+	created: object.payload.created,
+	(object.payload.errors map (obj, idx) -> {
+		statusCode: obj.statusCode,
+		errorMessage: obj.message,
+		fields: obj.fields
+	}),
+}]]></ee:set-payload>
+                </ee:message>
+              </ee:transform>
+              <logger
+                level="INFO"
+                doc:name="Logger"
+                doc:id="2e6debc1-d8fb-4ac6-9189-61cccabf73f5"
+                message="#[payload]" />
+              <set-variable
+                value='#[payload.id[0] default ""]'
+                doc:name="Set externalId"
+                doc:id="6f641af7-84f0-4e5c-8498-f3535bba0e55"
+                variableName="externalId" />
+              <foreach
+                doc:name="For Each"
+                doc:id="f7a1fbb3-671c-487e-8d54-21faff3097d1"
+                collection="vars.payloadCurrentGroupMember"
+                batchSize="50"
+              >
+                <logger
+                  level="INFO"
+                  doc:name="Logger"
+                  doc:id="71ff3bd5-eeb0-4248-8b5c-04a12a387b09"
+                  message='#[%dw 2.2
+output application/json
+---
+payload map ( payloadCurrentGroupMember , indexOfPayloadCurrentGroupMember ) -&gt; {
+	CampaignId: vars.externalId,
+	Campaign_User_Id: vars.externalId default "" ++ "_" ++ payloadCurrentGroupMember.Properties.Property[1].Value,
+	ContactId: payloadCurrentGroupMember.Properties.Property[2].Value,
+	Email: payloadCurrentGroupMember.Properties.Property[0].Value
+}]' />
+                <salesforce:upsert
+                  objectType="CampaignMember"
+                  doc:name="Upsert"
+                  doc:id="80da065e-ae2e-4985-a260-b9b2a8fc8dd6"
+                  config-ref="Salesforce_Config"
+                  externalIdFieldName="Campaign_User_Id__c"
+                >
+                  <reconnect
+                    frequency="5000"
+                    count="5" />
+                  <salesforce:records><![CDATA[#[output application/java
+---
+payload map ( payloadCurrentGroupMember , indexOfPayloadCurrentGroupMember ) -> {
+	CampaignId: vars.externalId,
+	Campaign_User_Id__c: vars.externalId default "" ++ "_" ++ payloadCurrentGroupMember.Properties.Property[1].Value,
+	ContactId: payloadCurrentGroupMember.Properties.Property[2].Value,
+//	Email: payloadCurrentGroupMember.Properties.Property[0].Value, // EMail wird aus Contact übernommen auf SFSC Seite
+//	Customer_Number__c: payloadCurrentGroupMember.Properties.Property[1].Value as Number // muss geklärt werden, kann null sein! und eventuell wird es auf string umgestellt.
+}]]]></salesforce:records>
+                </salesforce:upsert>
+                <ee:transform
+                  doc:name="Transform Message"
+                  doc:id="396db756-3b3b-46b2-ae47-dc6507bb1ef4"
+                >
+                  <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.2
+output application/json
+---
+payload.items map (object, i) -> 
+{
+	objectType: "CampaignMember",
+	id: object.payload.id,
+	success: object.payload.success,
+	created: object.payload.created,
+	(object.payload.errors map (obj, idx) -> {
+		statusCode: obj.statusCode,
+		errorMessage: obj.message,
+		fields: obj.fields
+	}),
+}]]></ee:set-payload>
+                  </ee:message>
+                </ee:transform>
+                <logger
+                  level="INFO"
+                  doc:name="Logger"
+                  doc:id="add7bc5a-1f48-4dae-b80a-e73d91cfbb1e"
+                  message="#[payload]" />
+              </foreach>
+
+
+            </route>
+
+          </scatter-gather>
+        </foreach>
+      </route>
+    </scatter-gather>
+  </flow>
+  <flow
+    name="flow16.ResetCustomerSegmentsCampaigns"
+    doc:id="430cddf8-34b8-4b50-ba95-8de4f9f6f638"
+  >
+    <set-variable
+      value="#[&quot;SELECT PersonEmail, SFCC_Customer_Number__pc, PersonContactId  FROM 'DataExtensionObject[&quot; ++ p('internationalisation.marketingCloud.externalKey.MasterCustomerData.' ++ vars.VTWEG) ++ &quot;]'&quot;]"
+      doc:name="Set SQL-Statement"
+      doc:id="ffc9ffe5-0f33-4ac1-8737-8cddb3e879c3"
+      variableName="sqlStatement" />
+    <sfdc-marketing-cloud:retrieve
+      doc:name="Retrieve Customer Lists"
+      doc:id="5e3a398c-7d7e-48b7-ae68-fc69cb56bc79"
+      config-ref="Salesforce_Marketing_Cloud_Config"
+    >
+      <reconnect
+        frequency="5000"
+        count="5" />
+      <sfdc-marketing-cloud:query><![CDATA[#[vars.sqlStatement as String]]]></sfdc-marketing-cloud:query>
+    </sfdc-marketing-cloud:retrieve>
+    <set-variable
+      value="#[payload]"
+      doc:name="Set Variable allCustomers"
+      doc:id="cdea4a51-0bfd-4bf0-be59-1676de9697dd"
+      variableName="allCustomers" />
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="950df4ec-e041-45b0-80d4-8937602e43cb"
+      message='#["Retrieve Customer Lists:/n"]' />
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="43df9e55-e7e3-4010-8a39-6f8aad37e86c"
+      message="#[payload]" />
+    <set-payload
+      value='#[vars.payload_Campaigns filter ($.Properties.Property[2].Value == "False")]'
+      doc:name="Set Payload"
+      doc:id="5f0f4c0c-ffc4-48fe-83ef-29ec8539c7bc" />
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="86fd3354-c81f-476e-91c7-45ef9e9a1c65" >
+      <os:retrieve doc:name="Retrieve Token" doc:id="78e82319-f255-433f-91a5-2964b940f062" key="sfccAuthToken" target="token" />
+    </until-successful>
+    <crypto:jce-decrypt-pbe
+      doc:name="Jce decrypt pbe"
+      doc:id="b1d21249-dc48-474a-8c60-c0ea2a3001ac"
+      password="${secure::objectstore.password}"
+      target="token"
+    >
+      <crypto:content><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+output application/java
+---
+fromBase64(vars.token.token)]]]></crypto:content>
+    </crypto:jce-decrypt-pbe>
+    <foreach
+      doc:name="For Each"
+      doc:id="12f5493f-8549-4f5d-a737-687c21f5568d"
+      collection="#[payload]"
+    >
+			<set-variable
+        value="#[%dw 2.0
+output text/plain
+---
+payload.Properties.Property[1].Value]"
+        doc:name="Set Variable DE_Name_Reset"
+        doc:id="caaff4cf-60fd-4a0f-b38d-d02cfd7d6183"
+        variableName="DE_Name_Reset" />
+			<foreach doc:name="For Each" doc:id="36fe7963-15f6-472f-aae4-d668602c37b1" collection="#[vars.allCustomers]" batchSize="20000">
+				<ee:transform doc:name="Transform Message" doc:id="f4358916-2beb-46b4-854d-c0fc2c89eff3">
+        <ee:message>
+          <ee:set-payload><![CDATA[%dw 2.2
+output application/xml
+ns ns0 http://www.demandware.com/xml/impex/customergroup/2007-06-30
+
+import * from dw::core::Strings 
+
+
+---
+	"customer-groups" @(xmlns: "http://www.demandware.com/xml/impex/customergroup/2007-06-30"): {
+		(payload map (object, j) -> {
+			("group-assignment" @("mode": "delete", "customer-no": object.Properties.Property[1].Value, "group-id": vars.DE_Name_Reset): {
+			}) if (!isEmpty(object.Properties.Property[1].Value))
+		})
+}
+]]></ee:set-payload>
+        </ee:message>
+        <ee:variables>
+          <ee:set-variable variableName="payloadCurrentGroupMember"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+        </ee:variables>
+      </ee:transform>
+				<set-variable value='#["test" ++ uuid() ++ "_customerLists_reset.xml"]' doc:name="Set ImportFileName" doc:id="f0bf0a68-b437-43de-af11-18fd9959eec3" variableName="fileName" />
+				<logger level="INFO" doc:name="Logger" doc:id="f3534ed0-7913-443b-9ff4-dd3d2c8e5741" message="yeah"/>
+				<scatter-gather doc:name="Scatter-Gather" doc:id="0fc4f3af-04b8-42ea-abd7-2dce892fc144">
+        <route>
+          <http:request method="POST" doc:name="/POST CustomerGroupsImport" doc:id="f5c40ea5-fdae-447e-9a49-abcbf48a9de0" config-ref="HTTP_Request_configuration_API_Auth" path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]">
+            <reconnect frequency="5000" count="5" />
+          </http:request>
+        </route>
+        <route>
+          <http:request method="POST" doc:name="/POST CustomerGroupsImport" doc:id="a97414b2-d7fe-4843-bb13-b566029bb0fd" config-ref="HTTP_Request_configuration_stage_API_Auth" path="#[p('sfcc.import.customergroups.path.' ++ vars.VTWEG) ++ vars.fileName]">
+            <reconnect frequency="5000" count="5" />
+          </http:request>
+        </route>
+      </scatter-gather>
+			</foreach>
+    </foreach>
+  </flow>
+
+</mule>

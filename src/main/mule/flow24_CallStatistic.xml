@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="flow24.callStatistic" doc:id="2ef9ffe5-1268-43fa-b36a-eb073b232c25" maxConcurrency="1" initialState="started">
+		<scheduler doc:name="Scheduler" doc:id="1ff03f09-c63b-4381-bffb-b93ea6b551ce" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="60" timeUnit="MINUTES" startDelay="1"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="f6615ad2-9d01-41ef-ab9f-67aa30518f60" message="Flow 24 Call Statistic - Started" />
+		<sftp:list doc:name="List Directory" doc:id="8bdc83e2-d83f-45c7-87b7-859e64af1b45" config-ref="SFTP_Config_Callcenter" directoryPath="#[p('sftp.path.callcenter')]">
+			<reconnect frequency="5000" count="5"/>
+			<sftp:matcher filenamePattern="{*.csv}" />
+		</sftp:list>
+		<foreach doc:name="For Each" doc:id="8404d7c9-fbe0-44e8-8a1f-b5e624472cfb" >
+			<logger level="INFO" doc:name="Logger" doc:id="3762dbc1-923d-46b3-be2c-a3554bcc9d3b" message='#["Processing  =&gt; " ++ attributes.path default "nothing found"]' />
+			<set-variable value="#[attributes.fileName]" doc:name="Set filePath" doc:id="389ad76d-c32e-442b-b7dc-581dae4d81e7" variableName="filePath"/>
+			<until-successful maxRetries="6" doc:name="Until Successful" doc:id="675ee869-96e1-406e-bbb5-dab29f4f2f75" millisBetweenRetries="30000">
+			<sftp:read doc:name="Read" doc:id="de5703c3-227b-4f36-aef1-dfce1cae6fa2" config-ref="SFTP_Config_Callcenter" path="#[p('sftp.path.callcenter') ++ &quot;/&quot; ++ vars.filePath]" target="result" outputMimeType='application/csv; separator=","'>
+				<ee:repeatable-file-store-stream bufferUnit="MB" />
+				<reconnect frequency="5000" count="5"/>
+			</sftp:read>
+				<salesforce:upsert doc:name="Upsert" doc:id="6d37db61-ff00-48c0-8071-561fccf1d0ba" config-ref="Salesforce_Config" externalIdFieldName="CALLID__c" objectType="CallStatistic__c">
+					<salesforce:records><![CDATA[#[%dw 2.0
+output application/java
+---
+payload map ( object, index) -> {
+	"AGENTCODE__c": object.AgentCode,
+	"ALERTINGTIME__c": object.AlertingTime,
+	"CALLDATE__c": object.CallDate as DateTime >> "UTC",
+	"CALLDIRECTION__c": object.CallDirection,
+	"CALLEDNUMBER__c": object.CalledNumber,
+	"CALLJOBRESULT__c": object.CallJobResult,
+	"DEVICECODE__c": object.DeviceCode,
+	"HOLDTIME__c": object.HoldTime,
+	"QUEUE__c": object.Queue,
+	"RESULT__c": object.Result,
+	"TALKINGTIME__c": object.TalkingTime,
+	"CALLID__c": object.CallID,
+	"CALLBEGIN__c": object.CallBegin,
+	"CSS__c": object.CSS
+}]]]></salesforce:records>
+				</salesforce:upsert>
+				<ee:transform doc:name="Transform Message" doc:id="6743de2a-cf53-450a-8fa2-f34322b9f3d6">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.2
+output application/json
+---
+payload.items map (object, i) -> 
+{
+	objectType: "CallStatistic",
+	id: object.payload.id,
+	success: object.payload.success,
+	created: object.payload.created,
+	(object.payload.errors map (obj, idx) -> {
+		statusCode: obj.statusCode,
+		errorMessage: obj.message,
+		fields: obj.fields
+	}),
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="f811f34a-d651-40b0-8ad2-869306d0597b" message="#[payload]" />
+			</until-successful>
+			<sftp:delete doc:name="Delete File" doc:id="afeb25d9-7e01-45f4-9d7f-d9c8d8e558e0" config-ref="SFTP_Config_Callcenter" path="#[p('sftp.path.callcenter') ++ &quot;/&quot; ++ vars.filePath]">
+				<reconnect frequency="5000" count="5" />
+			</sftp:delete>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="cb6ab06d-898e-404d-b01f-ab8da55325b5" message='#["Flow 24 Call Statistic - Finished:  =&gt; " ++ vars.filePath default "nothing found"]' />
+	</flow>
+</mule>

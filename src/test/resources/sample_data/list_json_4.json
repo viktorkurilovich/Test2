@@ -1,0 +1,92 @@
+[
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+regression@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00025003"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  },
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+automation@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00018001"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  },
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+poslead@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00014508"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  },
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+firstorder@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00016509"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  },
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+leadcheck@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00018501"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  },
+  {
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+registrierung@gmail.com"
+        },
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00020502"
+        }
+      ]
+    },
+    "Type": "DataExtensionObject"
+  }
+]

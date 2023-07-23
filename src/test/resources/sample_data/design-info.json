@@ -1,0 +1,38 @@
+{
+  "sampleData": {
+    "90c29d59-3015-4513-8f96-2e77a4f73d3b": {
+      "payload": "sample_data/unknown.dwl"
+    },
+    "729ce639-68bd-4b6f-89a1-10fa25c867ff": {
+      "payload": "sample_data/list_json.json"
+    },
+    "833b08fc-7fe3-49e6-8771-e2b585309f05": {
+      "payload": "sample_data/list_object.dwl"
+    },
+    "c97aab9d-6581-4c3a-88af-da1fccc52f5d": {
+      "payload": "sample_data/list_unknown_1.csv"
+    },
+    "16231010-7c86-49c7-b716-7384b63e5dc3": {
+      "vars-payload_Campaigns": "sample_data/list_json_1.json",
+      "payload": "sample_data/list_json_2.json",
+      "vars-DE_Id": "sample_data/list_defaultstringtype.dwl"
+    },
+    "3467e55f-1965-49ec-b0bf-7ab8729fd59d": {
+      "payload": "sample_data/customer-groups.xml"
+    },
+    "93d88248-37ab-44fb-a47f-9ea8075a3e2b": {
+      "vars-payloadCurrentGroup": "sample_data/list_json_3.json"
+    },
+    "ff7de434-5ef0-4fc8-a77e-a7decb57086e": {
+      "vars-payloadCurrentGroupMember": "sample_data/list_json_4.json",
+      "vars-externalId": "sample_data/defaultstringtype.dwl"
+    },
+    "d593132c-119e-46e9-8b99-f92f9c9ccec7": {
+      "vars-externalId": "sample_data/defaultstringtype.json",
+      "payload": "sample_data/list_unknown.dwl"
+    },
+    "6d37db61-ff00-48c0-8071-561fccf1d0ba": {
+      "payload": "sample_data/list_unknown_2.csv"
+    }
+  }
+}

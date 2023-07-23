@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:os="http://www.mulesoft.org/schema/mule/os"
+  xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto"
+  xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd"
+>
+  <flow
+    name="flow20.RecylceBag"
+    doc:id="4732d03d-b1aa-4211-828a-190940c942fa"
+    maxConcurrency="1" initialState="started">
+    <scheduler
+      doc:name="Scheduler"
+      doc:id="c794afb3-7971-4f0b-8470-598ad935d06e"
+    >
+      <scheduling-strategy>
+        <fixed-frequency
+          frequency="13"
+          timeUnit="MINUTES"
+          startDelay="1" />
+      </scheduling-strategy>
+    </scheduler>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="255ba4e7-4639-4604-8026-c9e83e700c10"
+      message="Flow 20 RecylceBag - Started" />
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="d7cda5bc-15f9-4d40-861f-455f1e7a054c" >
+      <os:retrieve doc:name="Retrieve Token" doc:id="f76b6136-ce86-497d-97c6-b7618945c0bc" key="sfccAuthToken" target="token" />
+    </until-successful>
+    <crypto:jce-decrypt-pbe
+      doc:name="Jce decrypt pbe"
+      doc:id="6291b047-f451-4878-8085-5abe68f4c734"
+      password="${secure::objectstore.password}"
+      target="token"
+    >
+      <crypto:content><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+output application/java
+---
+fromBase64(vars.token.token)]]]></crypto:content>
+    </crypto:jce-decrypt-pbe>
+    <sftp:list
+      doc:name="List files"
+      doc:id="acf643f8-df62-4422-886e-edeb66197bcc"
+      config-ref="SFTP_Config"
+      directoryPath="#[p('sftp.path.recycle')]"
+    >
+      <reconnect
+        frequency="5000"
+        count="5" />
+      <sftp:matcher filenamePattern="{[a-zA-Z]*.csv}" />
+    </sftp:list>
+    <foreach
+      doc:name="For Each"
+      doc:id="9f6ef2f3-31d7-49cc-aab2-41a6260c789d"
+    >
+      <logger
+        level="INFO"
+        doc:name="Logger"
+        doc:id="e915ccfb-5b98-4335-aa6e-4169b44cc432"
+        message='#["Processing  =&gt; " ++ attributes.path default "nothing found"]' />
+      <set-variable
+        value='#[attributes.fileName]'
+        doc:name="Set filePath"
+        doc:id="5627eaeb-8b63-4309-94c3-73acef0110f4"
+        variableName="filePath" />
+      <set-variable
+        value='#[import * from dw::core::Strings
+
+---
+substringAfter(attributes.fileName, "_")]'
+        doc:name="Set fileName"
+        doc:id="4d1acceb-a55e-4c97-8806-83c2c6fb3190"
+        variableName="fileName" />
+      <set-variable
+        value="#[%dw 2.0
+output application/java
+import * from dw::core::Strings
+
+---
+p('internationalisation.shopSite.' ++ lower(substringBefore(attributes.fileName, &quot;_&quot;)))]"
+        doc:name="Set shopSite"
+        doc:id="c5ca5dd8-3ef9-4cf8-a97b-76f295bb4cb3"
+        variableName="shopSite" />
+      <set-variable value="#[%dw 2.0&#10;output application/java&#10;import * from dw::core::Strings&#10;&#10;---&#10;p('businessOrganization.siteId.avoury.' ++ lower(substringBefore(attributes.fileName, &quot;_&quot;)))]" doc:name="siteId" doc:id="0ba151ec-9308-4879-909f-175bcb705344" variableName="siteId"/>
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="cccb9364-e8ca-4088-8464-b449ff50d04c" >
+        <sftp:read doc:name="Read" doc:id="7b4b9600-e1f8-4060-b9d2-04e3ed07edac" config-ref="SFTP_Config" path="#[p('sftp.path.recycle') ++ &quot;/&quot; ++ vars.filePath]" target="result" outputMimeType='application/csv; separator=";"'>
+        <ee:repeatable-file-store-stream bufferUnit="MB" />
+        <reconnect frequency="5000" count="5" />
+      </sftp:read>
+				<set-variable value="#[payload]" doc:name="recycleBagFile" doc:id="80dc3689-964f-4d72-a1b6-3037e93168ab" variableName="recycleBagFile"/>
+      </until-successful>
+      <ee:transform doc:name="Transform Message" doc:id="c97aab9d-6581-4c3a-88af-da1fccc52f5d">
+        <ee:message>
+          <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.recycleBagFile map ( object, index) -> {
+	"orderNo": object.ShopAuftragsnummer,
+	"status": "ORDERSTATUS",
+	"sap-orderNo": object.ID,
+	"siteId":vars.siteId,	
+	data: {
+		"customer-no": object.ShopKundennummer,
+		"processing-date": (object.DatumBearbeitung as Date {format: "dd.MM.yyyy"}) as String {format: "yyyy-MM-dd"} ++ "T00:00:00.000Z",
+		"num-bags": (object.AnzahlTueten as Number)
+	}
+}]]></ee:set-payload>
+        </ee:message>
+      </ee:transform>
+			<foreach doc:name="For Each" doc:id="2ad7627f-c42f-4438-b9fb-111ed3331d98" collection="payload">
+				<http:request method="POST" doc:name="/POST recycleBag" doc:id="8ba7331a-a48c-4500-8f22-43dcd10e1ebd" config-ref="HTTP_Request_configuration_API_Auth" path='#["/src/import/orderstatus/status/" ++ (vars.fileName default "no-name.csv" replace ".csv" with ("_" ++ uuid()++ ".json"))]' responseTimeout="90000">
+          <reconnect frequency="5000" count="5" />
+        </http:request>
+      </foreach>
+			<sftp:delete
+        doc:name="Delete"
+        doc:id="ea1c5c33-a8af-4665-8bb9-c339c496a12a"
+        config-ref="SFTP_Config"
+        path="#[p('sftp.path.recycle') ++&quot;/&quot; ++ vars.filePath]"
+      >
+        <reconnect
+          frequency="5000"
+          count="5" />
+      </sftp:delete>
+      <logger
+        level="INFO"
+        doc:name="Logger"
+        doc:id="8df5bc2b-2d8f-4981-b122-cbe0cad6577b"
+        message='#["Flow 20 RecylceBag - Finished  =&gt; " ++ vars.filePath default "nothing found"]' />
+    </foreach>
+
+  </flow>
+</mule>

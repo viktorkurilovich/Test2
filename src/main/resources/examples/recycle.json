@@ -1,0 +1,10 @@
+{
+    "orderNo": "t-00005532",
+    "status": "ORDERSTATUS",
+    "sap-orderNo": "435345345",
+    "data": {
+        "customer-no": "kdj",
+        "processing-date": "dasdk",
+        "num-bags": 2
+    }
+  }

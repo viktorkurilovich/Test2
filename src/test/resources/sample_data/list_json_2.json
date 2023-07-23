@@ -1,0 +1,170 @@
+ [
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+regression@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00025003"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }, 
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+automation@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00018001"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }, 
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+poslead@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00014508"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }, 
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+firstorder@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00016509"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }, 
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+leadcheck@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00018501"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }, 
+  {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+        {
+          "Name": "PersonEmail",
+          "Value": "lutzi.lutz06+registrierung@gmail.com"
+        }, 
+        {
+          "Name": "SFCC_Customer_Number__pc",
+          "Value": "00020502"
+        }
+      ]
+    },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+  }
+]

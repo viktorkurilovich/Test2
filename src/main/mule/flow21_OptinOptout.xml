@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+  xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto"
+  xmlns:os="http://www.mulesoft.org/schema/mule/os"
+  xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns:sfdc-marketing-cloud="http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud http://www.mulesoft.org/schema/mule/sfdc-marketing-cloud/current/mule-sfdc-marketing-cloud.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd"
+>
+  <flow
+    name="flow21.OptinOptout"
+    doc:id="4814f08b-5d66-411b-b729-aa95d168d139"
+    maxConcurrency="1"
+    initialState="stopped"
+  >
+    <scheduler
+      doc:name="Scheduler"
+      doc:id="e657aa49-9396-477b-af1d-d7be6414deed"
+    >
+      <scheduling-strategy>
+        <fixed-frequency
+          frequency="5"
+          timeUnit="MINUTES"
+          startDelay="1" />
+      </scheduling-strategy>
+    </scheduler>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="24f571bf-d687-4e34-ae88-722274a7b21b"
+      message="Flow 21 OptinOptout - Started" />
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="e0ad8dfc-b74f-4236-86a6-1a9ad4ec2a0b" >
+      <os:retrieve doc:name="Retrieve Token" doc:id="0d35b874-38b9-4ad9-8468-25dd6b8cf8ab" key="sfccAuthToken" target="token" />
+    </until-successful>
+    <crypto:jce-decrypt-pbe
+      doc:name="Jce decrypt pbe"
+      doc:id="fc8f6662-5acb-466a-9ed0-8ff75ed64d58"
+      password="${secure::objectstore.password}"
+      target="token"
+    >
+      <crypto:content><![CDATA[#[%dw 2.0
+import * from dw::core::Binaries
+output application/java
+---
+fromBase64(vars.token.token)]]]></crypto:content>
+    </crypto:jce-decrypt-pbe>
+    <set-variable
+      value="#[p('internationalisation.shopSite.active') splitBy(/[,]/)]"
+      doc:name="Set active Shopsites"
+      doc:id="a04de4a9-57d5-46db-afff-81af91cbfe87"
+      variableName="acitveShopsite" />
+    <foreach
+      doc:name="For Each"
+      doc:id="3adfc64f-de03-4546-84e3-af44f1dc26b1"
+      collection="#[vars.acitveShopsite]"
+    >
+      <set-variable
+        value="#[payload]"
+        doc:name="Set VTWEG"
+        doc:id="7091c919-14c0-42a0-8802-20b31352223b"
+        variableName="VTWEG" />
+      <set-variable value="#[p('sfmc.client.id.' ++ vars.VTWEG) default &quot;&quot;]" doc:name="sfmcClientId" doc:id="3a212424-6091-469f-a5d9-2294e58b48d6" variableName="sfmcClientId" />
+			<set-variable value="#[p('sfmc.client.secret.' ++ vars.VTWEG) default &quot;&quot;]" doc:name="sfmcClientSecret" doc:id="9a852cef-87cb-40ff-afcf-ad6d82953437" variableName="sfmcClientSecret" />
+			<set-variable
+        value="#[&quot;SELECT Kundennummer, Optin_Confirmed, Optin_Date, Lead_Source FROM 'DataExtensionObject[&quot; ++ p('internationalisation.marketingCloud.externalKey.Newsletter_Subscription.' ++ vars.VTWEG) ++ &quot;]' WHERE Exported_Flag = 0&quot;]"
+        doc:name="Set SQL-Statement"
+        doc:id="4cbce7ad-2306-4781-92a2-b81ff6d3c6c9"
+        variableName="sqlStatement" />
+      <sfdc-marketing-cloud:retrieve
+        doc:name="Retrieve Opt-ins"
+        doc:id="28b9683d-91aa-4dc4-bfd1-205b0f015787"
+        config-ref="Salesforce_Marketing_Cloud_Config"
+      >
+        <reconnect
+          frequency="5000"
+          count="5" />
+        <sfdc-marketing-cloud:query><![CDATA[#[vars.sqlStatement]]]></sfdc-marketing-cloud:query>
+      </sfdc-marketing-cloud:retrieve>
+      <choice
+        doc:name="Choice"
+        doc:id="b31c5b43-cb3a-423d-8fe1-3805a6cfe84c"
+      >
+        <when expression="#[sizeOf(payload) != 0]">
+          <set-variable
+            value="#[payload]"
+            doc:name="Set payload_ori"
+            doc:id="81c2d51e-9013-484f-8212-bca2272e465b"
+            variableName="payload_ori" />
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="b41cdef8-17c9-4b59-a652-95d2647b2215"
+            message="#[%dw 2.2
+output application/json
+---
+payload]" />
+          <ee:transform
+            doc:name="Transform Message"
+            doc:id="729ce639-68bd-4b6f-89a1-10fa25c867ff"
+          >
+            <ee:message>
+              <ee:set-payload><![CDATA[%dw 2.2
+output application/xml writeDeclaration=true
+import * from dw::core::Strings
+
+fun getNewsLetterasBoolean(obj) =
+	if (obj != null and obj == "True")
+		true
+	else
+		false
+
+// 7/8/2019 12:00:00 AM "7/8/2019 12:00:00 AM"
+fun getDate(obj) =
+	if (obj != null)
+		substringBefore(obj, " ") as Date {format: "M/d/yyyy"}  as Date {format: "yyyy-MM-dd"} 
+	else
+		null
+		
+
+---
+{
+	"customers" @(xmlns: "http://www.demandware.com/xml/impex/customer/2006-10-31"): {
+			(payload map (object, i) -> {
+				"customer" @("customer-no": object.Properties.Property[0].Value):{
+					"profile": {
+						"custom-attributes": {
+							"custom-attribute" @("attribute-id": "newsletter"): getNewsLetterasBoolean(object.Properties.Property[1].Value),
+							"custom-attribute" @("attribute-id": "optin_date"): getDate(object.Properties.Property[2].Value),
+							"custom-attribute" @("attribute-id": "lead_source"): object.Properties.Property[3].Value							
+						}
+					}
+					
+			}
+		}
+	)			
+	}
+}]]></ee:set-payload>
+            </ee:message>
+          </ee:transform>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="ea37fa2e-9a32-4ea2-b87b-38fabdf34d2b"
+            message="#[payload]" />
+          <set-variable
+            value='#[uuid() ++ "_optin.xml"]'
+            doc:name="Set ImportFileName"
+            doc:id="4f4375e4-e2b2-41c2-84cf-6dcc88cad002"
+            variableName="fileName" />
+          <http:request
+            method="POST"
+            doc:name="/POST CustomerImport"
+            doc:id="87459737-4cce-41a6-855c-11b1f5317368"
+            path="#[p('sfcc.import.customers.path.' ++ vars.VTWEG) ++ vars.fileName]"
+            config-ref="HTTP_Request_configuration_API_Auth"
+          >
+            <reconnect
+              frequency="5000"
+              count="5" />
+          </http:request>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="82fc1b68-a13d-4bae-9a78-3586422c7a7a"
+            message="#[payload]" />
+        </when>
+        <otherwise>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="5fb3816c-241c-4f0e-ae54-b8dbc7d5fb30"
+            message="No new Optins found" />
+        </otherwise>
+      </choice>
+      <set-variable
+        value="#[&quot;SELECT Kundennummer, Optin_Confirmed, Optout_Date, OptOutArt FROM 'DataExtensionObject[&quot; ++ p('internationalisation.marketingCloud.externalKey.Newsletter_Unsubscription.' ++ vars.VTWEG) ++ &quot;]' WHERE Exported_Flag = 0&quot;]"
+        doc:name="Set SQL-Statement"
+        doc:id="75e61061-198a-41b0-80e4-07393da93b30"
+        variableName="sqlStatement" />
+      <sfdc-marketing-cloud:retrieve
+        doc:name="Retrieve Opt-outs"
+        doc:id="d44de51d-8df2-4098-9a76-61f3a3a49c9e"
+        config-ref="Salesforce_Marketing_Cloud_Config"
+      >
+        <reconnect
+          frequency="5000"
+          count="5" />
+        <sfdc-marketing-cloud:query><![CDATA[#[vars.sqlStatement]]]></sfdc-marketing-cloud:query>
+      </sfdc-marketing-cloud:retrieve>
+      <choice
+        doc:name="Choice"
+        doc:id="1f6c15df-a5ec-42f2-a66c-cb2fb597157a"
+      >
+        <when expression="#[sizeOf(payload) != 0]">
+          <set-variable
+            value="#[payload]"
+            doc:name="Set payload_ori"
+            doc:id="0d1efdc0-d593-4ce9-8e10-fbb2f9f3e9c7"
+            variableName="payload_ori" />
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="dcc43e9e-f9ee-42fe-851f-b086c11a8d60"
+            message="#[%dw 2.2
+output application/json
+---
+payload]" />
+          <ee:transform
+            doc:name="Transform Message"
+            doc:id="833b08fc-7fe3-49e6-8771-e2b585309f05"
+          >
+            <ee:message>
+              <ee:set-payload><![CDATA[%dw 2.0
+output application/xml writeDeclaration=true
+
+import * from dw::core::Strings
+
+fun getNewsLetterasBoolean(obj) =
+	if (obj != null and obj == "True")
+		true
+	else
+		false
+
+// 7/8/2019 12:00:00 AM "7/8/2019 12:00:00 AM"
+fun getDate(obj) =
+	if (obj != null)
+		substringBefore(obj, " ") as Date {format: "M/d/yyyy"}  as Date {format: "yyyy-MM-dd"} 
+	else
+		null
+
+---
+{
+	"customers" @(xmlns: "http://www.demandware.com/xml/impex/customer/2006-10-31"): {
+			(payload map (object, i) -> {
+				"customer" @("customer-no": object.Properties.Property[0].Value):{
+					"profile": {
+						"custom-attributes": {
+							"custom-attribute" @("attribute-id": "newsletter"): getNewsLetterasBoolean(object.Properties.Property[1].Value),
+							"custom-attribute" @("attribute-id": "optout_date"): getDate(object.Properties.Property[2].Value)
+						}
+					}
+					
+			}
+		}
+	)			
+	}
+}]]></ee:set-payload>
+            </ee:message>
+          </ee:transform>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="c6df6b2c-d58f-41ff-abb3-3fc4877c8f91"
+            message="#[payload]" />
+          <set-variable
+            value='#[uuid() ++ "_optout.xml"]'
+            doc:name="Set ImportFileName"
+            doc:id="aa0ef2d3-d3b0-4f73-97a1-f46e1ca19055"
+            variableName="fileName" />
+          <http:request
+            method="POST"
+            doc:name="/POST Customers"
+            doc:id="08b90367-a9ae-4b24-9109-a44639bee0dd"
+            config-ref="HTTP_Request_configuration_API_Auth"
+            path="#[p('sfcc.import.customers.path.' ++ vars.VTWEG) ++ vars.fileName]"
+          >
+            <reconnect
+              frequency="5000"
+              count="5" />
+          </http:request>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="f664d270-9693-424f-b06c-50d6edd1fa1a"
+            message="#[payload]" />
+        </when>
+        <otherwise>
+          <logger
+            level="INFO"
+            doc:name="Logger"
+            doc:id="d04089b6-db9c-4f04-bb82-0f77032c9ffc"
+            message="No new Optouts found" />
+        </otherwise>
+      </choice>
+    </foreach>
+    <logger
+      level="INFO"
+      doc:name="Logger"
+      doc:id="e7e6130f-3156-4505-8890-daa1d3356e41"
+      message="Flow 21 OptinOptout -  Ended" />
+  </flow>
+
+</mule>

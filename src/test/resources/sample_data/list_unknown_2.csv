@@ -1,0 +1,4 @@
+"CallID","CallDirection","CallDate","Queue","Destination","CalledNumber","AgentCode","DeviceCode","CallBegin","AlertingTime","TalkingTime","HoldTime","CallJobResult","Result","CSS"
+"9CF5E0D43117D5468491E80B10ED22FF","InComing","2020-01-14 10:34","Melitta_Avoury_INFO_DE","4036097695","30001","HELLMICHMI","631025","3","3","96","0","8","NoAnswer","1"
+"3B73B954DD668A4CB8EC881022F37B86","InComing","2020-01-14 18:25","Melitta_Avoury_INFO_DE","81218831002","30001","GOEBELDE","640104","3","3","872","0","11","NormalClearing",""
+"3BC8A4C6EB9A814489D68EFD0D4FF72F","Outgoing","2020-01-14 18:54","5259P","","00491517080061","GOEBELDE","640104","32","32","132","0","11","NormalClearing","0"

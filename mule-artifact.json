@@ -1,0 +1,12 @@
+{
+  "secureProperties": ["secure::sfsc.security.token",
+  "secure::sfsc.pw",
+  "secure::sftp.pw.callcenter",
+  "secure::sftp.pw",
+  "secure::sfmc.client.secret",
+  "secure::sfcc.clientSecret",
+  "secure::objectstore.password",
+  "secure::credentials.cloudhubpw", 
+  "secure.key"],
+  "minMuleVersion": "4.3.0"
+}

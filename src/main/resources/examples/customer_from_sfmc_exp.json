@@ -1,0 +1,366 @@
+[
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "4444"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Test_FR"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "False"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "1234"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Mein Geburtsagsfilter"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "True"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "2222"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Test_NL"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "False"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "1111"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Test_AU"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "True"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "3333"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Test_ES"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "True"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "7890"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Tst_RC"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "False"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": ""
+                },
+                {
+          "Name": "Start Date",
+          "Value": ""
+                },
+                {
+          "Name": "End Date",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": ""
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": ""
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    },
+    {
+    "Owner": null,
+    "PartnerKey": null,
+    "ObjectID": null,
+    "CustomerKey": null,
+    "ModifiedDate": null,
+    "Properties": {
+      "Property": [
+                {
+          "Name": "segment_id",
+          "Value": "5555"
+                },
+                {
+          "Name": "segment_name",
+          "Value": "Test_MP"
+                },
+                {
+          "Name": "delete_in_SFCC_flag",
+          "Value": "False"
+                },
+                {
+          "Name": "Campaign Name",
+          "Value": "TestCampaign"
+                },
+                {
+          "Name": "Start Date",
+          "Value": "9/10/2019 12:00:00 AM"
+                },
+                {
+          "Name": "End Date",
+          "Value": "9/11/2019 12:00:00 AM"
+                },
+                {
+          "Name": "Kampagnen Art",
+          "Value": "TestArt"
+                },
+                {
+          "Name": "Kampagnen Mechanism",
+          "Value": "TestMech"
+                }
+            ]
+        },
+    "Name": null,
+    "PartnerProperties": null,
+    "ObjectState": null,
+    "Type": "DataExtensionObject",
+    "Keys": null,
+    "CreatedDate": null,
+    "ID": null,
+    "CorrelationID": null,
+    "Client": null
+    }
+]
